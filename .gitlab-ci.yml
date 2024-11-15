@@ -1,0 +1,59 @@
+image: node:16  # Use a Node.js image (optional, based on your site generator)
+
+stages:
+  - build
+  - script
+  - deploy
+
+variables:
+  PROJECT_NAME: 'gitlab CICD deploying'
+  PROJECT_LEARNING: 'I am learning GitLab and CICD'
+
+# Build stage
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+    - echo "Project name is $PROJECT_NAME and $PROJECT_LEARNING" >> app.log
+  artifacts:
+    paths:
+      - app.log  # Save logs as an artifact
+      - public/  # Include the built static files
+  tags:
+    - dev    
+
+# Logging example
+logging: 
+  stage: script
+  script:
+    - echo "Hello world, this is deploying a Next.js project and stage $CI_JOB_STAGE" >> app.log
+  artifacts:
+    paths:
+      - app.log  # Save logs as an artifact
+  tags:
+    - dev        
+
+# Logging additional example
+logging_res: 
+  stage: script
+  script:
+    - echo "Hello world, this is another stage for Next.js deployment" >> app.log
+  artifacts:
+    paths:
+      - app.log  # Save logs as an artifact
+  tags:
+    - dev    
+
+# Deploy stage
+pages:
+  stage: deploy
+  script:
+    - cp -r public/ /public  # Copy static files to the Pages directory
+  artifacts:
+    paths:
+      - public  # GitLab Pages reads from this directory
+  only:
+    - main  # Run this only on the main branch
+  tags:
+    - dev     
